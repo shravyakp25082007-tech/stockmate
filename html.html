@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Manager Pro - Shop Inventory Management</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Dark Mode Toggle -->
+    <button class="dark-mode-toggle" id="darkModeToggle" aria-label="Toggle dark mode">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <!-- Header/Navbar -->
+    <header class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-brand">
+                <i class="fas fa-boxes"></i>
+                <h1>Stock Manager Pro</h1>
+            </div>
+            <div class="navbar-date">
+                <i class="fas fa-calendar-alt"></i>
+                <span id="currentDate"></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="container">
+        <!-- Navigation Tabs -->
+        <nav class="tab-nav">
+            <button class="tab-btn active" data-tab="dashboard">
+                <i class="fas fa-chart-line"></i>
+                Dashboard
+            </button>
+            <button class="tab-btn" data-tab="inventory">
+                <i class="fas fa-boxes"></i>
+                Inventory
+            </button>
+            <button class="tab-btn" data-tab="planning">
+                <i class="fas fa-calendar-check"></i>
+                Daily Planning
+            </button>
+            <button class="tab-btn" data-tab="transactions">
+                <i class="fas fa-exchange-alt"></i>
+                Transactions
+            </button>
+        </nav>
+
+        <!-- ===== DASHBOARD TAB ===== -->
+        <section id="dashboard" class="tab-content active">
+            <h2>Today's Overview</h2>
+            
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <i class="fas fa-cube"></i>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Total Stock Value</p>
+                        <p class="stat-value" id="totalStockValue">₹0</p>
+                        <p class="stat-detail" id="totalItems">0 items</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">To Buy Today</p>
+                        <p class="stat-value" id="buyToday">0</p>
+                        <p class="stat-detail">items marked</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">To Sell Today</p>
+                        <p class="stat-value" id="sellToday">0</p>
+                        <p class="stat-detail">items marked</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Low Stock Alert</p>
+                        <p class="stat-value" id="lowStockCount">0</p>
+                        <p class="stat-detail">items to restock</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stock Status Chart -->
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3><i class="fas fa-chart-pie"></i> Stock Status Distribution</h3>
+                    <div class="chart-container">
+                        <div class="stock-status-chart">
+                            <div class="status-bar" id="goodStockBar">
+                                <span class="status-label">Good Stock</span>
+                                <div class="bar-fill" style="background: linear-gradient(90deg, #4CAF50, #45a049);"></div>
+                                <span class="status-count" id="goodStockNum">0</span>
+                            </div>
+                            <div class="status-bar" id="lowStockBar">
+                                <span class="status-label">Low Stock</span>
+                                <div class="bar-fill" style="background: linear-gradient(90deg, #FFC107, #FFB300);"></div>
+                                <span class="status-count" id="lowStockNum">0</span>
+                            </div>
+                            <div class="status-bar" id="outOfStockBar">
+                                <span class="status-label">Out of Stock</span>
+                                <div class="bar-fill" style="background: linear-gradient(90deg, #f44336, #da190b);"></div>
+                                <span class="status-count" id="outOfStockNum">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3><i class="fas fa-list"></i> Recent Alerts</h3>
+                    <div id="alertsList" class="alerts-list">
+                        <p class="empty-state">No alerts yet. Everything looks good!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== INVENTORY TAB ===== -->
+        <section id="inventory" class="tab-content">
+            <div class="inventory-header">
+                <h2>Inventory Management</h2>
+                <button class="btn btn-primary" id="addProductBtn">
+                    <i class="fas fa-plus"></i> Add Product
+                </button>
+            </div>
+
+            <!-- Search & Filters -->
+            <div class="search-filters">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search by product name...">
+                </div>
+
+                <div class="filter-group">
+                    <select id="categoryFilter" class="filter-select">
+                        <option value="">All Categories</option>
+                    </select>
+
+                    <select id="statusFilter" class="filter-select">
+                        <option value="">All Status</option>
+                        <option value="good">Good Stock</option>
+                        <option value="low">Low Stock</option>
+                        <option value="out">Out of Stock</option>
+                    </select>
+
+                    <select id="planningFilter" class="filter-select">
+                        <option value="">All Items</option>
+                        <option value="buy">To Buy Today</option>
+                        <option value="sell">To Sell Today</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Toggle View -->
+            <div class="view-toggle">
+                <button class="view-btn active" id="tableViewBtn" data-view="table">
+                    <i class="fas fa-table"></i> Table
+                </button>
+                <button class="view-btn" id="cardViewBtn" data-view="card">
+                    <i class="fas fa-th"></i> Cards
+                </button>
+            </div>
+
+            <!-- Table View -->
+            <div id="tableView" class="table-view active">
+                <table class="product-table">
+                    <thead>
+                        <tr>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Quantity</th>
+                            <th>Buy Price</th>
+                            <th>Sell Price</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productTableBody">
+                        <!-- Products will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Card View -->
+            <div id="cardView" class="card-view">
+                <div id="productCardsContainer" class="products-grid">
+                    <!-- Product cards will be inserted here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== DAILY PLANNING TAB ===== -->
+        <section id="planning" class="tab-content">
+            <h2>Daily Planning</h2>
+
+            <div class="planning-container">
+                <!-- Date Selector -->
+                <div class="card">
+                    <h3><i class="fas fa-calendar"></i> Select Date</h3>
+                    <input type="date" id="planningDate" class="date-input">
+                </div>
+
+                <!-- Buy Planning -->
+                <div class="card">
+                    <h3><i class="fas fa-shopping-cart"></i> Items to Buy Today</h3>
+                    <div id="buyPlanningList" class="planning-list">
+                        <p class="empty-state">No items marked to buy</p>
+                    </div>
+                    <button class="btn btn-secondary" id="addBuyItemBtn">
+                        <i class="fas fa-plus"></i> Add Item to Buy
+                    </button>
+                </div>
+
+                <!-- Sell Planning -->
+                <div class="card">
+                    <h3><i class="fas fa-money-bill-wave"></i> Items to Sell Today</h3>
+                    <div id="sellPlanningList" class="planning-list">
+                        <p class="empty-state">No items marked to sell</p>
+                    </div>
+                    <button class="btn btn-secondary" id="addSellItemBtn">
+                        <i class="fas fa-plus"></i> Add Item to Sell
+                    </button>
+                </div>
+
+                <!-- Quick Summary -->
+                <div class="card summary-card">
+                    <h3><i class="fas fa-chart-line"></i> Today's Summary</h3>
+                    <div class="summary-stats">
+                        <div class="summary-stat">
+                            <span class="summary-label">Total to Buy:</span>
+                            <span class="summary-value" id="summaryBuyQty">0</span>
+                        </div>
+                        <div class="summary-stat">
+                            <span class="summary-label">Estimated Cost:</span>
+                            <span class="summary-value" id="summaryBuyCost">₹0</span>
+                        </div>
+                        <div class="summary-stat">
+                            <span class="summary-label">Total to Sell:</span>
+                            <span class="summary-value" id="summarySellQty">0</span>
+                        </div>
+                        <div class="summary-stat">
+                            <span class="summary-label">Estimated Revenue:</span>
+                            <span class="summary-value" id="summarySellRevenue">₹0</span>
+                        </div>
+                    </div>
+                    <textarea id="planningNotes" class="notes-field" placeholder="Add notes for supplier or customer..."></textarea>
+                    <button class="btn btn-primary" id="savePlanBtn">
+                        <i class="fas fa-save"></i> Save Plan
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== TRANSACTIONS TAB ===== -->
+        <section id="transactions" class="tab-content">
+            <h2>Quick Transactions</h2>
+
+            <div class="transactions-grid">
+                <!-- Quick Buy Entry -->
+                <div class="card">
+                    <h3><i class="fas fa-shopping-cart"></i> Quick Buy Entry</h3>
+                    <div class="transaction-form">
+                        <select id="buyProductSelect" class="form-control">
+                            <option value="">Select Product to Buy</option>
+                        </select>
+                        <div class="qty-selector">
+                            <button class="qty-btn" id="buyQtyMinus">−</button>
+                            <input type="number" id="buyQtyInput" value="1" min="1" readonly>
+                            <button class="qty-btn" id="buyQtyPlus">+</button>
+                        </div>
+                        <input type="number" id="buyPriceInput" placeholder="Price per unit (₹)" step="0.01">
+                        <input type="text" id="buySupplierInput" placeholder="Supplier name (optional)">
+                        <button class="btn btn-success" id="addBuyBtn">
+                            <i class="fas fa-plus"></i> Add Purchase
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quick Sell Entry -->
+                <div class="card">
+                    <h3><i class="fas fa-money-bill-wave"></i> Quick Sell Entry</h3>
+                    <div class="transaction-form">
+                        <select id="sellProductSelect" class="form-control">
+                            <option value="">Select Product to Sell</option>
+                        </select>
+                        <div class="qty-selector">
+                            <button class="qty-btn" id="sellQtyMinus">−</button>
+                            <input type="number" id="sellQtyInput" value="1" min="1" readonly>
+                            <button class="qty-btn" id="sellQtyPlus">+</button>
+                        </div>
+                        <input type="number" id="sellPriceInput" placeholder="Price per unit (₹)" step="0.01">
+                        <input type="text" id="buyerNameInput" placeholder="Customer name (optional)">
+                        <button class="btn btn-success" id="addSellBtn">
+                            <i class="fas fa-check"></i> Add Sale
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transaction History -->
+            <div class="card">
+                <h3><i class="fas fa-history"></i> Transaction History</h3>
+                <div id="transactionHistory" class="transaction-list">
+                    <p class="empty-state">No transactions yet</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Bottom Action Bar (Mobile) -->
+    <footer class="bottom-action-bar">
+        <button class="action-btn" id="quickStatsBtn">
+            <i class="fas fa-info-circle"></i>
+            <span>Stats</span>
+        </button>
+        <button class="action-btn active" id="dashboardQuickBtn">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </button>
+        <button class="action-btn" id="addQuickBtn">
+            <i class="fas fa-plus-circle"></i>
+            <span>Add</span>
+        </button>
+    </footer>
+
+    <!-- Modal for Add/Edit Product -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add New Product</h3>
+                <button class="modal-close" id="closeProductModal">&times;</button>
+            </div>
+            <form id="productForm" class="form-grid">
+                <input type="hidden" id="productId">
+                
+                <div class="form-group">
+                    <label for="productName">Product Name *</label>
+                    <input type="text" id="productName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="productCategory">Category *</label>
+                    <select id="productCategory" required>
+                        <option value="">Select Category</option>
+                        <option value="Electronics">Electronics</option>
+                        <option value="Groceries">Groceries</option>
+                        <option value="Clothing">Clothing</option>
+                        <option value="Books">Books</option>
+                        <option value="Medicines">Medicines</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="productQuantity">Available Quantity *</label>
+                    <input type="number" id="productQuantity" min="0" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="minQuantity">Minimum Stock Level *</label>
+                    <input type="number" id="minQuantity" min="0" required value="5">
+                </div>
+
+                <div class="form-group">
+                    <label for="buyingPrice">Buying Price (₹) *</label>
+                    <input type="number" id="buyingPrice" step="0.01" min="0" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="sellingPrice">Selling Price (₹) *</label>
+                    <input type="number" id="sellingPrice" step="0.01" min="0" required>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelProductBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Tooltip -->
+    <div id="tooltip" class="tooltip"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
